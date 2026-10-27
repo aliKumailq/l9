@@ -33,7 +33,7 @@ struct Interval {
 };
 
 struct DynamicCamera {
-    void update(Camera& camera,                           // the camera to update
+    inline void update(Camera& camera,                           // the camera to update
                 const sf::Vector2f& trackedPosWorld,      // world coords of player to track
                 const sf::Vector2f& trackedVelocityWorld  // world velocity of player to track
     ) {
@@ -47,6 +47,8 @@ struct DynamicCamera {
         // lookahead) appropriately. Next,
         // set the camera center by offsetting the cameraUnadjustedCenter, combining lookAhead.
         // Finally update cameraUnadjustedCenter, but without lookahead.
+        
+
     }
 
     float alpha;  // alpha to use for damping of camera position, *as well as* for smoothing of
