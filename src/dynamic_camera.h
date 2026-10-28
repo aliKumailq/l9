@@ -48,13 +48,33 @@ struct DynamicCamera {
         // set the camera center by offsetting the cameraUnadjustedCenter, combining lookAhead.
         // Finally update cameraUnadjustedCenter, but without lookahead.
         auto lookAheadDistance = camera.windowPercentToWorldDist(sf::Vector2f{lookAhead, 0}).x * (trackedVelocityWorld.x < 0 ? -1 : 1);
-        // FIXME: Account for zero velocity.
-
         if (trackedVelocityWorld.x == 0) lookAheadDistance = 0;
 
           lookaheadState = lookaheadState + alpha * (lookAheadDistance - lookaheadState);
                                                     // target is the lookAheadDistance + current camera center.
-          camera.setCameraCenter({lookaheadState + trackedPosWorld.x, camera.getCameraCenter().y});
+                                                    //
+          
+          auto percentWindow = camera.worldToWindowPercent(trackedPosWorld);
+          if (!softZoneX.contains(percentWindow.x)) {
+            // if in the hard exclusion zone
+            auto hard_boundary = percentWindow.x > 0.5 ? softZoneX.max : softZoneX.min;
+            auto a = sf::Vector2f{hard_boundary, percentWindow.y};
+            camera.setCameraPercent(trackedPosWorld, {hard_boundary, percentWindow.y});
+            return;
+
+          } else if (!deadZoneX.contains(percentWindow.x)) {
+
+            auto hard_boundary = percentWindow.x > 0.5 ? deadZoneX.max : deadZoneX.min;
+            auto dir_push = -hard_boundary  + percentWindow.x;
+            dir_push *= 1000;
+
+
+            cameraUnadjustedCenter = cameraUnadjustedCenter + (alpha) * ((cameraUnadjustedCenter + sf::Vector2f{dir_push, 0.0f}) - cameraUnadjustedCenter);
+
+
+
+          }
+         camera.setCameraCenter({lookaheadState + trackedPosWorld.x, camera.getCameraCenter().y});
 
 
 
