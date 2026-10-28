@@ -47,6 +47,22 @@ struct DynamicCamera {
         // lookahead) appropriately. Next,
         // set the camera center by offsetting the cameraUnadjustedCenter, combining lookAhead.
         // Finally update cameraUnadjustedCenter, but without lookahead.
+        auto lookAheadDistance = camera.windowPercentToWorldDist(sf::Vector2f{lookAhead, 0}).x * (trackedVelocityWorld.x < 0 ? -1 : 1);
+        // FIXME: Account for zero velocity.
+
+        if (trackedVelocityWorld.x == 0) lookAheadDistance = 0;
+
+          lookaheadState = lookaheadState + alpha * (lookAheadDistance - lookaheadState);
+                                                    // target is the lookAheadDistance + current camera center.
+          camera.setCameraCenter({lookaheadState + trackedPosWorld.x, camera.getCameraCenter().y});
+
+
+
+        auto screenPosPerc = camera.worldToWindowPercent(trackedPosWorld);
+        auto screenVelPerc = camera.worldToWindowPercentDist(trackedVelocityWorld);
+
+
+
         
 
     }
